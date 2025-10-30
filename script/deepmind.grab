@@ -1,0 +1,12 @@
+LOAD_URL "https://deepmind.google/discover/blog/"
+
+FIND_ALL "a"
+FILTER DATE YESTERDAY
+
+GET_ATTR "href"
+SAVE url
+
+GRAB_ARTICLES FROM url
+SAVE articles
+
+SAVE_TO_FILE "articles2.json" FROM articles
