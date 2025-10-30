@@ -66,6 +66,11 @@ class GrabInterpreter:
                 if command_key == "SELECTION":
                     self.commands["SELECT"] = handler_instance
                     self._debug_print(f"Alias ajouté: SELECT -> {command_key}")
+                elif command_key == "UTILITIES":
+                    self.commands["SAVE"] = handler_instance
+                    self.commands["USE"] = handler_instance
+                    self._debug_print(f"Alias ajouté: SAVE -> {command_key}")
+                    self._debug_print(f"Alias ajouté: USE -> {command_key}")
                 
             else:
                 self._debug_print(f"Attention: Classe {class_name} non trouvée dans {handler_file}")
@@ -162,6 +167,12 @@ class GrabInterpreter:
         # Vérifie si la commande existe
         if command_key and command_key in self.commands:
             self._debug_print(f"Exécution de {command_key} avec arguments: {args}")
+            
+            # Gestion spéciale pour SAVE et USE qui passent par UTILITIES
+            if command_key in ["SAVE", "USE"]:
+                # Prépend le nom de la sous-commande aux arguments
+                args = [command_key] + args
+            
             # Exécute la commande avec les arguments restants
             result = self.commands[command_key].execute(args, self.variables)
             
@@ -171,7 +182,7 @@ class GrabInterpreter:
                 self._debug_print(f"Résultat stocké dans _last_result (type: {type(result).__name__})")
         else:
             self._debug_print(f"Aucune commande trouvée, vérification des commandes spéciales")
-            # Vérifie les commandes spéciales (SAVE, COUNT, etc.)
+            # Vérifie les commandes spéciales (COUNT, etc.)
             self._handle_special_commands(tokens)
     
     def _parse_line(self, line: str) -> List[str]:

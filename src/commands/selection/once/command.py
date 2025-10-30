@@ -9,6 +9,7 @@ from pathlib import Path
 # Ajoute le chemin vers le module core
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "core"))
 from base_command import BaseCommand
+from colors import CommandColors
 
 class SelectOnceCommand(BaseCommand):
     """Commande pour sélectionner un élément spécifique par son index"""
@@ -21,9 +22,10 @@ class SelectOnceCommand(BaseCommand):
         self.debug_mode = debug_mode
     
     def _debug_print(self, message: str):
-        """Affiche un message seulement en mode debug"""
+        """Affiche un message seulement en mode debug avec couleur"""
         if self.debug_mode:
-            print(f"[SELECT ONCE] {message}")
+            colored_prefix = CommandColors.colorize_prefix("SELECT ONCE", "SELECT ONCE")
+            print(f"{colored_prefix} {message}")
     
     def execute(self, args: List[str], variables: Dict[str, Any]) -> Tag:
         """
