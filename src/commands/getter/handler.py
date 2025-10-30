@@ -52,17 +52,23 @@ class GetterHandler(BaseCommand):
             spec.loader.exec_module(module)
             
             # Récupère la classe de commande (convention: GetterSubcommandCommand)
-            class_name = f"Getter{subcommand.title()}Command"
+            # Gère les noms avec underscores (ex: attr_first -> AttrFirst)
+            class_suffix = "".join(word.title() for word in subcommand.split("_"))
+            class_name = f"Getter{class_suffix}Command"
+            
             if hasattr(module, class_name):
                 command_class = getattr(module, class_name)
                 command_instance = command_class()
-                self.subcommands[subcommand.upper()] = command_instance
+                
+                # Convertit le nom en majuscules avec underscores pour la clé
+                command_key = subcommand.upper()
+                self.subcommands[command_key] = command_instance
                 
                 # Propage immédiatement le mode debug si déjà défini
                 if hasattr(command_instance, 'set_debug_mode'):
                     command_instance.set_debug_mode(self.debug_mode)
                 
-                self._debug_print(f"Sous-commande chargée: {subcommand.upper()}")
+                self._debug_print(f"Sous-commande chargée: {command_key}")
             else:
                 self._debug_print(f"Attention: Classe {class_name} non trouvée dans {command_file}")
                 
@@ -83,15 +89,19 @@ class GetterHandler(BaseCommand):
         if len(args) < 1:
             raise ValueError("GET: Il faut spécifier une sous-commande (ex: GET ATTR \"href\")")
         
+        # Pour les commandes composées comme ATTR_FIRST, l'argument vient déjà formaté
         subcommand = args[0].upper()
         subcommand_args = args[1:]
         
+        self._debug_print(f"Recherche de la sous-commande: {subcommand}")
+        self._debug_print(f"Sous-commandes disponibles: {list(self.subcommands.keys())}")
+        
         if subcommand not in self.subcommands:
-            available = ", ".join(self.subcommands.keys())
+            available = ", ".join(sorted(self.subcommands.keys()))
             raise ValueError(f"GET: Sous-commande '{subcommand}' inconnue. Disponibles: {available}")
         
-        # Vérifie qu'il y a un résultat précédent à traiter
-        if '_last_result' not in variables:
+        # Vérifie qu'il y a un résultat précédent à traiter pour les commandes qui en ont besoin
+        if subcommand in ['ATTR'] and '_last_result' not in variables:
             raise ValueError("GET: Aucun élément sélectionné. Utilisez d'abord une commande SELECT.")
         
         self._debug_print(f"Dispatch vers {subcommand} avec {len(subcommand_args)} argument(s): {subcommand_args}")

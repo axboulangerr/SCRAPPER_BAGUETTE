@@ -152,8 +152,16 @@ class GrabInterpreter:
         command_key = None
         args = []
         
-        if len(tokens) >= 2:
-            # Essaie la forme COMMAND SUBCOMMAND (avec espace dans le script)
+        # Essaie les commandes composées à 3 mots d'abord (GET ATTR FIRST)
+        if len(tokens) >= 3:
+            potential_key = f"{tokens[0].upper()}_{tokens[1].upper()}_{tokens[2].upper()}"
+            if tokens[0].upper() == "GET" and potential_key.replace("GET_", "") in self._get_getter_subcommands():
+                command_key = tokens[0].upper()  # GET
+                args = [tokens[1] + "_" + tokens[2]] + tokens[3:]  # ["ATTR_FIRST", ...remaining...]
+                self._debug_print(f"Commande GET composée trouvée: {tokens[1].upper()} {tokens[2].upper()}")
+        
+        # Sinon essaie les commandes composées à 2 mots (LOAD URL)
+        if command_key is None and len(tokens) >= 2:
             potential_key = f"{tokens[0].upper()}_{tokens[1].upper()}"
             if potential_key in self.commands:
                 command_key = potential_key
@@ -188,6 +196,12 @@ class GrabInterpreter:
             self._debug_print(f"Aucune commande trouvée, vérification des commandes spéciales")
             # Vérifie les commandes spéciales (COUNT, etc.)
             self._handle_special_commands(tokens)
+    
+    def _get_getter_subcommands(self):
+        """Récupère la liste des sous-commandes GET disponibles"""
+        if "GET" in self.commands and hasattr(self.commands["GET"], "subcommands"):
+            return self.commands["GET"].subcommands.keys()
+        return []
     
     def _parse_line(self, line: str) -> List[str]:
         """Parse une ligne en tokens, en gérant les chaînes entre guillemets"""
