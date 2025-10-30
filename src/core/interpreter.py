@@ -71,6 +71,9 @@ class GrabInterpreter:
                     self.commands["USE"] = handler_instance
                     self._debug_print(f"Alias ajouté: SAVE -> {command_key}")
                     self._debug_print(f"Alias ajouté: USE -> {command_key}")
+                elif command_key == "GETTER":
+                    self.commands["GET"] = handler_instance
+                    self._debug_print(f"Alias ajouté: GET -> {command_key}")
                 
             else:
                 self._debug_print(f"Attention: Classe {class_name} non trouvée dans {handler_file}")
@@ -128,7 +131,7 @@ class GrabInterpreter:
                 self._execute_line(line)
                 self._debug_print(f"Ligne {line_num}:  exécutée avec succès")
             except Exception as e:
-                print(f"❌ Erreur ligne {line_num}: {e}")
+                print(f"Erreur ligne {line_num}: {e}")
                 print(f"   Ligne: {line}")
                 if self.debug_mode:
                     import traceback
@@ -168,10 +171,11 @@ class GrabInterpreter:
         if command_key and command_key in self.commands:
             self._debug_print(f"Exécution de {command_key} avec arguments: {args}")
             
-            # Gestion spéciale pour SAVE et USE qui passent par UTILITIES
+            # Gestion spéciale pour SAVE, USE et GET qui passent par leurs handlers
             if command_key in ["SAVE", "USE"]:
                 # Prépend le nom de la sous-commande aux arguments
                 args = [command_key] + args
+            # GET n'a pas besoin de préfixer car les arguments sont déjà corrects
             
             # Exécute la commande avec les arguments restants
             result = self.commands[command_key].execute(args, self.variables)

@@ -42,10 +42,12 @@ class CommandColors:
         'SELECT FIRST': Colors.CYAN,       # Cyan pour SELECT FIRST
         'SELECT LAST': Colors.BRIGHT_CYAN, # Cyan vif pour SELECT LAST
         'SELECT ONCE': Colors.MAGENTA,     # Magenta pour SELECT ONCE
+        'GET': Colors.YELLOW,              # Jaune pour les commandes GET
+        'GET ATTR': Colors.BRIGHT_YELLOW,  # Jaune vif pour GET ATTR
+        'GET DATE': Colors.YELLOW,         # Jaune pour GET DATE
         'EXTRACT': Colors.YELLOW,          # Jaune pour les extractions
         'FILTER': Colors.BRIGHT_YELLOW,    # Jaune vif pour les filtres
-        'SAVE': Colors.BRIGHT_MAGENTA, 
-        'USE': Colors.MAGENTA,             # Magenta vif pour les sauvegardes
+        'SAVE': Colors.BRIGHT_MAGENTA,     # Magenta vif pour les sauvegardes
         'ERROR': Colors.BRIGHT_RED,        # Rouge vif pour les erreurs
         'SUCCESS': Colors.BRIGHT_GREEN,    # Vert vif pour les succès
     }

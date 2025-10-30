@@ -1,0 +1,9 @@
+LOAD URL "https://openai.com/fr-FR/news/"
+SELECT ALL "a"
+GET ATTR "href"
+SAVE liste_href
+SELECT ONCE "a" 1
+GET ATTR "class"
+SAVE class_a
+GET DATE "a"
+SAVE articles_dates
