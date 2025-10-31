@@ -341,6 +341,9 @@ class GrabLangParser:
             return ASTNode("STRING_LITERAL", token.value, line_number=token.line_number)
         elif token.type in [TokenType.SUBCOMMAND, TokenType.ARGUMENT]:
             return ASTNode("IDENTIFIER", token.value, line_number=token.line_number)
+        elif token.type == TokenType.OPERATOR:
+            # Support des opérateurs comme WHERE, CONTAINS, etc.
+            return ASTNode("OPERATOR", token.value, line_number=token.line_number)
         else:
             raise SyntaxError(f"Ligne {token.line_number}: Argument attendu, trouvé '{token.value}'")
     

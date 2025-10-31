@@ -1,4 +1,0 @@
-LOAD URL "https://httpbin.org/json"
-SELECT FIRST "slideshow"
-SAVE single_element
-PRINT single_element

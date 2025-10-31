@@ -1,0 +1,26 @@
+# Test du support WHERE dans GrabLang
+LOAD URL "https://openai.com/fr-FR/news/"
+SAVE main_page
+
+# Sélectionner tous les liens
+USE main_page
+SELECT ALL "a"
+SAVE all_links
+
+# Test de la syntaxe FILTER avec WHERE
+USE all_links
+FILTER ALL WHERE href CONTAINS "index"
+SAVE filtered_links
+
+PRINT "Liens filtrés avec WHERE:"
+PRINT filtered_links
+
+# Test sur un autre attribut
+USE main_page
+SELECT ALL "div"
+FILTER ALL WHERE class CONTAINS "container"
+SAVE container_divs
+
+PRINT "Divs avec classe container:"
+COUNT
+PRINT "Nombre de divs trouvés"

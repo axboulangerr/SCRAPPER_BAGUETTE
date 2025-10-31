@@ -92,6 +92,9 @@ class GrabLangExecutor:
                 args.append(f'"{arg_node.value}"')  # Remet les guillemets pour compatibilité
             elif arg_node.type == "IDENTIFIER":
                 args.append(arg_node.value)
+            elif arg_node.type == "OPERATOR":
+                # Support des opérateurs comme WHERE, CONTAINS, etc.
+                args.append(arg_node.value)
         
         self._debug_print(f"Exécution de la commande {command_name} avec arguments: {args}")
         

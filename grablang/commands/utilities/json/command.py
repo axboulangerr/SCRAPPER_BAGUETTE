@@ -3,14 +3,12 @@ Commande JSON pour convertir le contenu en format JSON
 """
 from bs4 import BeautifulSoup, Tag, ResultSet
 from typing import List, Dict, Any, Union
-import sys
-from pathlib import Path
 import json
+from pathlib import Path
 
-# Ajoute le chemin vers le module core
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "core"))
-from base_command import BaseCommand
-from colors import CommandColors
+# Import absolu vers le module utils du package grablang
+from grablang.utils.base_command import BaseCommand
+from grablang.utils.colors import CommandColors
 
 class UtilitiesJsonCommand(BaseCommand):
     """Commande pour convertir des données en format JSON"""
