@@ -1,4 +1,4 @@
-LOAD_URL "https://deepmind.google/discover/blog/"
+LOAD URL "https://deepmind.google/discover/blog/"
 
 FIND_ALL "a"
 FILTER DATE YESTERDAY

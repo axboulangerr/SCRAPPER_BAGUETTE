@@ -30,21 +30,32 @@ class LoadUrlCommand(BaseCommand):
     
     def execute(self, args: List[str], variables: Dict[str, Any]) -> BeautifulSoup:
         """
-        Exécute LOAD URL "url"
+        Exécute LOAD URL "url" ou LOAD URL variable_name "url"
         
         Args:
-            args: [url] - L'URL à charger
+            args: [url] ou [variable_name, url] - L'URL à charger avec optionnellement un nom de variable
             variables: Variables disponibles
             
         Returns:
             BeautifulSoup object contenant le HTML parsé
         """
-        self.validate_args(args, 1, "LOAD URL")
+        if len(args) < 1 or len(args) > 2:
+            raise ValueError("LOAD URL: Utilisez LOAD URL \"url\" ou LOAD URL variable_name \"url\"")
         
-        url = args[0]
+        # Détermine si on a une variable ou juste l'URL
+        if len(args) == 1:
+            # Format: LOAD URL "url"
+            url = args[0]
+            variable_name = None
+        else:
+            # Format: LOAD URL variable_name "url"
+            variable_name = args[0]
+            url = args[1]
         
         try:
             self._debug_print(f"Chargement de l'URL: {url}")
+            if variable_name:
+                self._debug_print(f"Sauvegarde dans la variable: {variable_name}")
             
             # Configuration des headers pour éviter les blocages
             headers = {
@@ -58,8 +69,13 @@ class LoadUrlCommand(BaseCommand):
             # Parse le HTML avec BeautifulSoup
             soup = BeautifulSoup(response.content, 'html.parser')
             
-            # Sauvegarde le document original pour les commandes SELECT
-            variables['_original_html'] = soup
+            # Si une variable est spécifiée, sauvegarde dans cette variable
+            if variable_name:
+                variables[variable_name] = soup
+                self._debug_print(f"Contenu HTML sauvegardé dans la variable '{variable_name}'")
+            else:
+                # Comportement original : sauvegarde dans _last_result et _original_html
+                variables['_original_html'] = soup
             
             self._debug_print(f" URL chargée avec succès ({len(response.content)} octets)")
             self._debug_print(f"Titre de la page: {soup.title.string if soup.title else 'Aucun titre'}")

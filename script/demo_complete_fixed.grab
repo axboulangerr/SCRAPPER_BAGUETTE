@@ -1,0 +1,298 @@
+# =================================================================
+# SCRIPT GRAB COMPLEXE CORRIGÉ - DÉMONSTRATION COMPLÈTE DU LANGAGE
+# =================================================================
+# Ce script démontre toutes les fonctionnalités du DSL GrabLang
+# Date: 31 octobre 2025 - Version corrigée
+
+# =================================================================
+# 1. CHARGEMENT DE DONNÉES MULTIPLES
+# =================================================================
+
+# Charge plusieurs sites dans des variables nommées (URLs fonctionnelles)
+LOAD URL deepmind "https://deepmind.google/discover/blog/"
+LOAD URL httpbin "https://httpbin.org/html"
+LOAD URL example "https://example.com"
+
+# Affichage des pages chargées
+PRINT deepmind
+PRINT httpbin
+PRINT example
+
+# =================================================================
+# 2. ANALYSE APPROFONDIE AVEC MODE DÉVELOPPEUR
+# =================================================================
+
+# Analyse détaillée des structures
+PRINT DEV deepmind
+PRINT DEV httpbin
+
+# =================================================================
+# 3. SÉLECTION ET FILTRAGE AVANCÉS
+# =================================================================
+
+# Travail avec DeepMind (page riche en contenu)
+USE deepmind
+
+# Sélection de tous les liens
+SELECT ALL "a"
+SAVE all_deepmind_links
+PRINT all_deepmind_links
+
+# Filtrage de tous les liens avec href
+FILTER ALL WHERE attr href NOT NULL
+SAVE valid_links_deepmind
+PRINT DEV valid_links_deepmind
+
+# Premier lien valide
+FILTER FIRST WHERE attr href CONTAINS "http"
+SAVE first_external_link
+PRINT DEV first_external_link
+
+# Dernier élément avec classe spécifique
+SELECT ALL "div"
+FILTER LAST WHERE class CONTAINS "grid"
+SAVE last_grid_div
+PRINT last_grid_div
+
+# Sélection d'un élément spécifique par index
+SELECT ALL "span"
+FILTER ONCE 3 WHERE text MATCHES ".+"
+SAVE third_span_with_text
+PRINT third_span_with_text
+
+# =================================================================
+# 4. EXTRACTION D'ATTRIBUTS AVEC SYNTAXE CORRECTE
+# =================================================================
+
+# Utiliser les liens valides pour extraire les attributs
+USE valid_links_deepmind
+
+# Récupération du premier href (syntaxe correcte)
+GET ATTR_FIRST href
+SAVE first_deepmind_href
+PRINT first_deepmind_href
+
+# Récupération du dernier href
+GET ATTR_LAST href
+SAVE last_deepmind_href
+PRINT last_deepmind_href
+
+# Récupération d'un href spécifique
+GET ATTR_ONCE 5 href
+SAVE fifth_deepmind_href
+PRINT fifth_deepmind_href
+
+# Récupération de tous les hrefs
+GET ATTR href
+SAVE all_deepmind_hrefs
+PRINT DEV all_deepmind_hrefs
+
+# =================================================================
+# 5. EXTRACTION DE DATES COMPLEXES
+# =================================================================
+
+# Recherche d'éléments avec des dates
+USE deepmind
+SELECT ALL "time"
+SAVE time_elements
+PRINT DEV time_elements
+
+# Si pas d'éléments time, chercher dans les spans
+SELECT ALL "span"
+FILTER ALL WHERE text MATCHES "[0-9]{4}"
+SAVE elements_with_years
+PRINT elements_with_years
+
+# Extraction des premières dates trouvées (syntaxe correcte)
+USE elements_with_years
+GET DATE_FIRST
+SAVE first_date_found
+PRINT first_date_found
+
+# =================================================================
+# 6. SÉLECTIONS AVANCÉES AVEC DIFFÉRENTS SÉLECTEURS
+# =================================================================
+
+# Retour sur DeepMind pour analyses complètes
+USE deepmind
+
+# Premier div
+SELECT FIRST "div"
+SAVE first_div
+PRINT DEV first_div
+
+# Dernier paragraphe
+SELECT LAST "p"
+SAVE last_paragraph
+PRINT DEV last_paragraph
+
+# Élément spécifique par index (syntaxe corrigée)
+SELECT ONCE 10 "img"
+SAVE tenth_image
+PRINT tenth_image
+
+# =================================================================
+# 7. CHAÎNAGE D'OPÉRATIONS COMPLEXES
+# =================================================================
+
+# Séquence complexe: navigation → sélection → filtrage → extraction
+USE deepmind
+
+# Trouve tous les articles ou contenus principaux
+SELECT ALL "article"
+SAVE articles
+PRINT articles
+
+# Chercher des divs avec classes spécifiques
+SELECT ALL "div"
+FILTER ALL WHERE class CONTAINS "content"
+SAVE content_divs
+PRINT content_divs
+
+# Extraction des titres depuis deepmind directement
+SELECT ALL "h1"
+SAVE h1_titles
+PRINT DEV h1_titles
+
+SELECT ALL "h2"
+SAVE h2_titles
+PRINT DEV h2_titles
+
+# Premier titre avec du texte
+SELECT ALL "h3"
+FILTER FIRST WHERE text MATCHES ".+"
+SAVE first_h3_title
+PRINT first_h3_title
+
+# =================================================================
+# 8. GESTION D'ERREURS ET CAS LIMITES
+# =================================================================
+
+# Test avec httpbin (structure simple)
+USE httpbin
+
+# Sélection sur une page simple
+SELECT ALL "p"
+SAVE simple_paragraphs
+PRINT simple_paragraphs
+
+# Test de filtrage sur peu d'éléments
+FILTER ALL WHERE text CONTAINS "test"
+SAVE test_paragraphs
+PRINT test_paragraphs
+
+# =================================================================
+# 9. EXTRACTION MASSIVE DE DONNÉES
+# =================================================================
+
+# Retour sur DeepMind pour extraction complète
+USE deepmind
+
+# Extraction de tous les liens de navigation
+SELECT ALL "nav"
+SAVE nav_elements
+PRINT nav_elements
+
+# Sélection dans les nav
+USE nav_elements
+SELECT ALL "a"
+SAVE nav_links
+PRINT DEV nav_links
+
+# Tous les attributs href des liens de navigation (syntaxe correcte)
+GET ATTR href
+SAVE nav_hrefs
+PRINT nav_hrefs
+
+# Extraction de toutes les images
+USE deepmind
+SELECT ALL "img"
+SAVE all_images
+PRINT all_images
+
+# Sources de toutes les images (syntaxe correcte)
+GET ATTR src
+SAVE image_sources
+PRINT DEV image_sources
+
+# Textes alternatifs des images
+GET ATTR alt
+SAVE image_alts
+PRINT image_alts
+
+# =================================================================
+# 10. COMBINAISONS AVANCÉES DE FILTRES
+# =================================================================
+
+# Recherche d'éléments avec classes multiples
+USE deepmind
+SELECT ALL "div"
+FILTER ALL WHERE class CONTAINS "flex"
+SAVE flex_divs
+PRINT flex_divs
+
+# Parmi les flex divs, ceux avec du texte
+FILTER ALL WHERE text MATCHES ".+"
+SAVE flex_divs_with_text
+PRINT DEV flex_divs_with_text
+
+# Premier flex div avec beaucoup de texte
+FILTER FIRST WHERE text MATCHES ".{20,}"
+SAVE first_long_text_flex
+PRINT first_long_text_flex
+
+# =================================================================
+# 11. TEST AVEC EXAMPLE.COM (PAGE SIMPLE)
+# =================================================================
+
+# Test sur une page très simple
+USE example
+PRINT DEV example
+
+# Extraction du titre
+SELECT ALL "h1"
+SAVE example_title
+PRINT example_title
+
+# Extraction du paragraphe
+SELECT ALL "p"
+SAVE example_paragraph
+PRINT DEV example_paragraph
+
+# =================================================================
+# 12. VÉRIFICATIONS ET TESTS DE ROBUSTESSE
+# =================================================================
+
+# Affichage de données importantes
+PRINT DEV all_deepmind_hrefs
+PRINT DEV image_sources
+PRINT DEV flex_divs_with_text
+
+# =================================================================
+# 13. RÉCAPITULATIF FINAL
+# =================================================================
+
+# Affichage de toutes les variables importantes créées
+PRINT deepmind
+PRINT httpbin
+PRINT example
+PRINT all_deepmind_links
+PRINT valid_links_deepmind
+PRINT all_deepmind_hrefs
+PRINT h1_titles
+PRINT h2_titles
+PRINT nav_links
+PRINT all_images
+PRINT flex_divs_with_text
+
+# =================================================================
+# FIN DU SCRIPT COMPLEXE CORRIGÉ
+# =================================================================
+# Variables créées: 25+
+# Pages analysées: 3 (DeepMind, HTTPBin, Example.com)
+# Commandes utilisées: LOAD URL, USE, SELECT (ALL/FIRST/LAST/ONCE), 
+#                      FILTER (ALL/FIRST/LAST/ONCE), GET (ATTR/DATE),
+#                      SAVE, PRINT, PRINT DEV
+# Opérations: 70+ lignes de traitement
+# Corrections: Syntaxe GET corrigée, URLs fonctionnelles
+# =================================================================

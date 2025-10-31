@@ -4,6 +4,7 @@ Commande USE pour réutiliser le contenu d'une variable comme _last_result
 from typing import List, Dict, Any
 import sys
 from pathlib import Path
+from bs4 import BeautifulSoup
 
 # Ajoute le chemin vers le module core
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "core"))
@@ -55,15 +56,27 @@ class UtilitiesUseCommand(BaseCommand):
         # Met à jour _last_result avec le contenu de la variable
         variables['_last_result'] = variable_content
         
-        # Si c'est un document HTML complet, met à jour _original_html
-        if hasattr(variable_content, 'find') and variable_content.name is None:  # BeautifulSoup root
+        # Si c'est un document HTML complet (BeautifulSoup), met à jour _original_html
+        if isinstance(variable_content, BeautifulSoup):
             variables['_original_html'] = variable_content
             self._debug_print(f"Variable '{variable_name}' définie comme document HTML principal")
-        # Si c'est un élément HTML spécifique, garde le document original
-        elif '_original_html' in variables:
-            self._debug_print(f"Variable '{variable_name}' utilisée, document HTML principal préservé")
+        # Sinon, vérifie si on a besoin de garder le document original
+        elif '_original_html' not in variables:
+            # Si aucun document original n'est défini, essaie de trouver un document parent
+            # depuis les autres variables BeautifulSoup disponibles
+            for var_name, var_content in variables.items():
+                if isinstance(var_content, BeautifulSoup) and not var_name.startswith('_'):
+                    variables['_original_html'] = var_content
+                    self._debug_print(f"Document HTML principal restauré depuis '{var_name}'")
+                    break
         
         result_type = type(variable_content).__name__
-        self._debug_print(f"Variable '{variable_name}' réutilisée (type: {result_type})")
+        
+        # Message informatif selon le type
+        if isinstance(variable_content, BeautifulSoup):
+            colored_prefix = CommandColors.colorize_prefix("USE", "SAVE")
+            print(f"{colored_prefix} Variable '{variable_name}' réutilisée (type: {result_type})")
+        else:
+            self._debug_print(f"Variable '{variable_name}' réutilisée (type: {result_type})")
         
         return variable_content

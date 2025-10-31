@@ -1,8 +1,8 @@
-# GrabLang 🕷️ - Le PostgreSQL du Web Scraping
+# GrabLang - Le PostgreSQL du Web Scraping
 
 **GrabLang** est un langage de domaine spécifique (DSL) conçu pour le web scraping avancé. Inspiré par la puissance et l'expressivité de PostgreSQL, GrabLang offre une syntaxe simple mais extrêmement puissante pour extraire, transformer et analyser des données web.
 
-## 🎯 Vision
+## Vision
 
 Créer un langage de scraping aussi expressif et puissant que PostgreSQL l'est pour les bases de données :
 - **Requêtes déclaratives** : Décrivez ce que vous voulez, pas comment l'obtenir
@@ -10,16 +10,16 @@ Créer un langage de scraping aussi expressif et puissant que PostgreSQL l'est p
 - **Typage intelligent** : Détection automatique des types de données
 - **Optimisation automatique** : Le moteur optimise vos requêtes de scraping
 
-## 🚀 Fonctionnalités Actuelles
+## Fonctionnalités Actuelles
 
-### 📥 Chargement de Données (LOAD)
+### Chargement de Données (LOAD)
 ```grab
 LOAD URL "https://example.com"
 LOAD FILE "page.html"
 LOAD JSON "data.json"
 ```
 
-### 🎯 Sélection d'Éléments (SELECT)
+### Sélection d'Éléments (SELECT)
 ```grab
 SELECT ALL "div.article"           # Tous les articles
 SELECT FIRST "h1"                  # Premier titre
@@ -27,7 +27,7 @@ SELECT LAST "img"                  # Dernière image
 SELECT ONCE "a" 3                  # Troisième lien (index 1-based)
 ```
 
-### 🔍 Extraction de Données (GET)
+### Extraction de Données (GET)
 ```grab
 # Extraction d'attributs
 GET ATTR "href"                    # Attributs des éléments sélectionnés
@@ -42,7 +42,7 @@ GET DATE LAST "time"               # Dernier élément time avec date
 GET DATE ONCE "p" 1                # Vérifie si le 1er paragraphe a une date
 ```
 
-### 💾 Gestion des Variables (SAVE/USE)
+### Gestion des Variables (SAVE/USE)
 ```grab
 SELECT ALL "a"
 GET ATTR "href"
@@ -53,14 +53,14 @@ FILTER CONTAINS "github"           # Filtre les liens GitHub
 SAVE github_links
 ```
 
-### 🎨 Système de Debug Coloré
+### Système de Debug Coloré
 - **Mode debug** avec couleurs distinctives pour chaque type de commande
 - **Traçabilité complète** de l'exécution
 - **Messages d'erreur** précis et contextuels
 
-## 🛣️ Roadmap - Vers la Puissance PostgreSQL
+## Roadmap - Vers la Puissance PostgreSQL
 
-### 🔄 Phase 1 : Transformations (En cours)
+### Phase 1 : Transformations (En cours)
 ```grab
 # Filtrage avancé
 FILTER WHERE class CONTAINS "active"
@@ -75,7 +75,7 @@ EXTRACT EMAILS                     # Extraction d'emails
 EXTRACT URLS                       # Extraction d'URLs dans le texte
 ```
 
-### 📊 Phase 2 : Agrégations et Analyses
+### Phase 2 : Agrégations et Analyses
 ```grab
 # Fonctions d'agrégation (comme SQL)
 COUNT                              # Nombre d'éléments
@@ -90,7 +90,7 @@ STATS LINKS                        # Analyse des liens (domaines, types)
 STATS IMAGES                       # Analyse des images (formats, tailles)
 ```
 
-### 🔗 Phase 3 : Relations et Jointures
+### Phase 3 : Relations et Jointures
 ```grab
 # Relations entre éléments (comme JOIN)
 RELATE PARENT "div"                # Éléments parents
@@ -102,7 +102,7 @@ JOIN WITH FILE "urls.csv" ON href
 JOIN WITH API "https://api.example.com" ON id
 ```
 
-### 🧠 Phase 4 : Intelligence Artificielle
+### Phase 4 : Intelligence Artificielle
 ```grab
 # Classification automatique
 CLASSIFY SENTIMENT                 # Analyse de sentiment
@@ -115,7 +115,7 @@ EXTRACT KEYWORDS                   # Mots-clés importants
 EXTRACT SUMMARY                    # Résumé automatique
 ```
 
-### 📈 Phase 5 : Optimisation et Performance
+### Phase 5 : Optimisation et Performance
 ```grab
 # Cache intelligent
 CACHE STRATEGY LRU                 # Stratégie de cache
@@ -130,7 +130,7 @@ MONITOR PERFORMANCE                # Métriques de performance
 MONITOR ERRORS                     # Suivi des erreurs
 ```
 
-### 🏗️ Phase 6 : Fonctions et Procédures
+### Phase 6 : Fonctions et Procédures
 ```grab
 # Fonctions personnalisées
 FUNCTION extract_price(text)
@@ -148,7 +148,7 @@ PROCEDURE scrape_ecommerce(url)
 END
 ```
 
-### 📡 Phase 7 : Intégrations et APIs
+### Phase 7 : Intégrations et APIs
 ```grab
 # Intégrations bases de données
 OUTPUT TO POSTGRES "postgresql://..."
@@ -165,27 +165,27 @@ EXPORT AS CSV "data.csv"
 EXPORT AS PARQUET "data.parquet"
 ```
 
-## 🏛️ Architecture
+## Architecture
 
-### 🧩 Système Modulaire
+### Système Modulaire
 - **Handlers dynamiques** : Chaque commande est un module indépendant
 - **Chargement automatique** : Découverte automatique des commandes
 - **Extensibilité** : Ajout facile de nouvelles fonctionnalités
 
-### 🎨 Système de Types
+### Système de Types
 - **Types primitifs** : string, number, boolean, date
 - **Types complexes** : Element, ElementList, URL, Email
 - **Types composés** : Table, Graph, Tree
 - **Inférence de types** : Détection automatique
 
-### ⚡ Moteur d'Optimisation
+### Moteur d'Optimisation
 - **Plan d'exécution** : Optimisation des requêtes complexes
 - **Cache multi-niveaux** : DOM, HTTP, résultats
 - **Parallélisation intelligente** : Optimisation automatique
 
-## 💡 Exemples d'Usage
+## Exemples d'Usage
 
-### 🏢 Scraping E-commerce
+### Scraping E-commerce
 ```grab
 LOAD URL "https://shop.example.com/products"
 SELECT ALL ".product-card"
@@ -202,7 +202,7 @@ FOREACH id
 END
 ```
 
-### 📰 Analyse de News
+### Analyse de News
 ```grab
 LOAD URL "https://news.example.com"
 SELECT ALL "article"
@@ -215,7 +215,7 @@ GROUP BY sentiment
 EXPORT AS JSON "news_analysis.json"
 ```
 
-### 🔍 Monitoring de Compétition
+### Monitoring de Compétition
 ```grab
 PROCEDURE monitor_competitor(url)
     LOAD URL url
@@ -230,7 +230,7 @@ END
 SCHEDULE DAILY monitor_competitor("https://competitor.com")
 ```
 
-## 🛠️ Installation et Usage
+## Installation et Usage
 
 ```bash
 # Installation
@@ -243,7 +243,7 @@ python src/core/interpreter.py script/example.grab
 python src/core/interpreter.py script/example.grab --debug
 ```
 
-## 🎯 Objectifs à Long Terme
+## Objectifs à Long Terme
 
 1. **Expressivité PostgreSQL** : Toute la puissance des requêtes SQL pour le web
 2. **Performance** : Scraping à grande échelle avec optimisations automatiques
@@ -251,7 +251,7 @@ python src/core/interpreter.py script/example.grab --debug
 4. **Écosystème** : Bibliothèque de fonctions et connecteurs
 5. **Standards** : Format d'échange inter-outils de scraping
 
-## 🤝 Contribution
+## Contribution
 
 GrabLang est conçu pour être extensible. Chaque nouvelle fonctionnalité suit l'architecture modulaire :
 
@@ -260,10 +260,10 @@ GrabLang est conçu pour être extensible. Chaque nouvelle fonctionnalité suit 
 3. **Ajouter les tests** correspondants
 4. **Documenter** la nouvelle fonctionnalité
 
-## 📜 Licence
+## Licence
 
 [Votre licence ici]
 
 ---
 
-**GrabLang** - *"Query the web like a database"* 🌐💫
+**GrabLang** - *"Query the web like a database"*

@@ -74,6 +74,9 @@ class GrabInterpreter:
                 elif command_key == "GETTER":
                     self.commands["GET"] = handler_instance
                     self._debug_print(f"Alias ajouté: GET -> {command_key}")
+                elif command_key == "FILTERING":
+                    self.commands["FILTER"] = handler_instance
+                    self._debug_print(f"Alias ajouté: FILTER -> {command_key}")
                 
             else:
                 self._debug_print(f"Attention: Classe {class_name} non trouvée dans {handler_file}")
@@ -152,8 +155,21 @@ class GrabInterpreter:
         command_key = None
         args = []
         
+        # Gestion spéciale pour FILTER qui a une syntaxe avec WHERE
+        if len(tokens) >= 4 and tokens[0].upper() == "FILTER":
+            if tokens[2].upper() == "WHERE":
+                # FILTER ALL/FIRST/LAST WHERE condition
+                command_key = "FILTER"
+                args = tokens[1:]  # [ALL/FIRST/LAST, WHERE, condition...]
+                self._debug_print(f"Commande FILTER trouvée: {tokens[1].upper()} WHERE {' '.join(tokens[3:])}")
+            elif len(tokens) >= 5 and tokens[3].upper() == "WHERE":
+                # FILTER ONCE index WHERE condition
+                command_key = "FILTER"
+                args = tokens[1:]  # [ONCE, index, WHERE, condition...]
+                self._debug_print(f"Commande FILTER ONCE trouvée: index {tokens[2]} WHERE {' '.join(tokens[4:])}")
+        
         # Essaie les commandes composées à 3 mots d'abord (GET ATTR FIRST)
-        if len(tokens) >= 3:
+        elif len(tokens) >= 3:
             potential_key = f"{tokens[0].upper()}_{tokens[1].upper()}_{tokens[2].upper()}"
             if tokens[0].upper() == "GET" and potential_key.replace("GET_", "") in self._get_getter_subcommands():
                 command_key = tokens[0].upper()  # GET
