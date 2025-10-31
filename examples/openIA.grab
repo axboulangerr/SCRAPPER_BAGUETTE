@@ -1,0 +1,32 @@
+LOAD URL "https://openai.com/fr-FR/news/"
+
+SELECT ALL "a"
+FILTER ALL WHERE href CONTAINS "index"
+SAVE article_links
+
+GET ATTR "href"
+SAVE article_urls
+
+FOR url IN article_urls {
+    
+    LOAD URL article url
+    USE article
+
+    SELECT ALL span
+    FILTER ALL WHERE aria-atomic CONTAINS "true"
+    SAVE spanf
+    PRINT spanf
+
+    USE spanf
+    EXTRACT TEXT CLEAN
+    SAVE title
+
+    PRINT title
+
+    SELECT ALL "article"
+    SAVE current_articles
+    JSON current_articles PRETTY title
+
+}
+
+

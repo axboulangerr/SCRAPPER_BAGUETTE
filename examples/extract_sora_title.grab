@@ -1,0 +1,11 @@
+# Test d'extraction de texte avec entités HTML
+LOAD URL "data:text/html,<span class='sr-only' aria-live='polite' aria-atomic='true'>Sora&nbsp;2 est disponible | OpenAI</span>"
+
+SELECT ALL "span"
+EXTRACT TEXT CLEAN
+SAVE extracted_text
+PRINT extracted_text
+
+JSON extracted_text PRETTY "sora_title"
+SAVE json_file
+PRINT json_file

@@ -1,8 +1,0 @@
-LOAD URL "https://openai.com/fr-FR/news/"
-SELECT ALL "a"
-SAVE links
-
-SELECT LAST "img"
-SAVE last_image
-SELECT ONCE "img" 1
-SAVE first_image
