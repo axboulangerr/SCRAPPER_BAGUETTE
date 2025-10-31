@@ -1,656 +1,330 @@
-# GrabLang - Langage DSL pour l'extraction de données web
+# 🕷️ GrabLang
 
-**GrabLang** est un langage de domaine spécifique (DSL) conçu pour l'extraction et l'analyse de données web de manière intuitive et puissante. Il permet de charger des pages web, de naviguer dans leur structure HTML, d'extraire des données et d'appliquer des filtres complexes.
+[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://python.org)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com)
+[![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-## 🚀 Installation et utilisation
+> Un langage de domaine spécifique (DSL) moderne et puissant pour l'extraction et l'analyse de données web
+
+GrabLang transforme l'extraction de données web en une expérience intuitive et déclarative. Conçu avec une architecture modulaire séparant parser et exécuteur, il permet de créer des pipelines de scraping complexes avec une syntaxe claire et expressive.
+
+## ✨ Fonctionnalités
+
+- 🌐 **Chargement web intelligent** - Support HTTP/HTTPS avec gestion d'erreurs robuste
+- 🎯 **Sélecteurs CSS avancés** - Navigation précise dans la structure HTML
+- 🔍 **Extraction par regex** - Patterns personnalisés avec flags et groupes de capture
+- 📊 **Filtrage conditionnel** - Conditions complexes sur attributs et contenu
+- 🔄 **Pipelines de traitement** - Chaînage d'opérations pour workflows sophistiqués
+- 🛠️ **Architecture modulaire** - Parser et exécuteur séparés pour une maintenabilité optimale
+- 🐛 **Mode debug avancé** - Diagnostic détaillé avec inspection d'éléments
+
+## 🚀 Installation rapide
 
 ### Prérequis
-- Python 3.8+
-- Modules listés dans `requirements.txt`
+- **Python 3.8+**
+- **pip** pour la gestion des dépendances
 
 ### Installation
+
 ```bash
+# Cloner le projet
+git clone https://github.com/votre-username/grablang.git
+cd grablang
+
+# Installer les dépendances
 pip install -r requirements.txt
+
+# Installation en mode développement
+pip install -e .
 ```
 
-### Exécution d'un script
+### Première utilisation
+
 ```bash
-python src/core/interpreter.py script/mon_script.grab
-python src/core/interpreter.py script/mon_script.grab --debug
+# Exécuter un script GrabLang
+grablang examples/demo_complete_fixed.grab
+
+# Mode debug pour développement
+grablang examples/demo_complete_fixed.grab --debug
 ```
 
-## 📋 Fonctionnalités du langage
+## 📖 Guide de démarrage
 
-### 1. **Chargement de données (LOAD)**
-
-#### LOAD URL
-Charge le contenu HTML d'une URL dans une variable.
+### Hello World GrabLang
 
 ```grab
-# Charge une URL dans une variable nommée
-LOAD URL ma_page "https://example.com"
-
-# Charge directement (stockage automatique)
+# Charger une page web
 LOAD URL "https://example.com"
-```
+SAVE main_page
 
-**Syntaxe :**
-- `LOAD URL variable_name "url"`
-- `LOAD URL "url"`
-
----
-
-### 2. **Navigation et contexte (USE)**
-
-#### USE
-Définit le document HTML de travail pour les opérations suivantes.
-
-```grab
-# Utilise une page précédemment chargée
-USE ma_page
-
-# Toutes les commandes SELECT, FILTER, etc. opèrent sur 'ma_page'
-```
-
-**Syntaxe :**
-- `USE variable_name`
-
----
-
-### 3. **Sélection d'éléments (SELECT)**
-
-#### SELECT ALL
-Sélectionne tous les éléments correspondant à un sélecteur CSS.
-
-```grab
-# Sélectionne tous les liens
-SELECT ALL "a"
-
-# Sélectionne tous les paragraphes
-SELECT ALL "p"
-
-# Sélectionne par classe CSS
-SELECT ALL ".ma-classe"
-
-# Sélectionne par ID
-SELECT ALL "#mon-id"
-```
-
-#### SELECT FIRST
-Sélectionne le premier élément correspondant.
-
-```grab
-# Premier div de la page
-SELECT FIRST "div"
-
-# Premier élément avec une classe spécifique
-SELECT FIRST ".navigation"
-```
-
-#### SELECT LAST
-Sélectionne le dernier élément correspondant.
-
-```grab
-# Dernier paragraphe
-SELECT LAST "p"
-
-# Dernier lien
-SELECT LAST "a"
-```
-
-#### SELECT ONCE
-Sélectionne un élément à un index spécifique (indexation à partir de 1).
-
-```grab
-# 5ème élément div
-SELECT ONCE 5 "div"
-
-# 3ème image
-SELECT ONCE 3 "img"
-```
-
-**Syntaxe :**
-- `SELECT ALL "selecteur"`
-- `SELECT FIRST "selecteur"`
-- `SELECT LAST "selecteur"`
-- `SELECT ONCE index "selecteur"`
-
----
-
-### 4. **Filtrage d'éléments (FILTER)**
-
-Les commandes FILTER permettent d'affiner une sélection existante selon des critères.
-
-#### FILTER ALL
-Filtre tous les éléments qui correspondent à une condition.
-
-```grab
-# Garde seulement les liens avec un attribut href
-SELECT ALL "a"
-FILTER ALL WHERE attr href NOT NULL
-
-# Garde les éléments contenant un texte spécifique
-SELECT ALL "p"
-FILTER ALL WHERE text CONTAINS "important"
-
-# Garde les éléments avec une classe spécifique
-SELECT ALL "div"
-FILTER ALL WHERE class CONTAINS "active"
-```
-
-#### FILTER FIRST
-Garde seulement le premier élément qui correspond à la condition.
-
-```grab
-# Premier lien externe
-SELECT ALL "a"
-FILTER FIRST WHERE attr href CONTAINS "http"
-```
-
-#### FILTER LAST
-Garde seulement le dernier élément qui correspond à la condition.
-
-```grab
-# Dernier élément avec du texte
-SELECT ALL "span"
-FILTER LAST WHERE text MATCHES ".+"
-```
-
-#### FILTER ONCE
-Garde un élément spécifique parmi ceux qui correspondent.
-
-```grab
-# 3ème élément contenant du texte
-SELECT ALL "p"
-FILTER ONCE 3 WHERE text NOT EMPTY
-```
-
-**Conditions de filtrage :**
-- `attr attribut EQUALS "valeur"` - Attribut égal à une valeur
-- `attr attribut CONTAINS "texte"` - Attribut contient du texte
-- `attr attribut NOT NULL` - Attribut existe
-- `class CONTAINS "classe"` - Classe CSS contient une valeur
-- `text CONTAINS "texte"` - Texte contient une chaîne
-- `text MATCHES "regex"` - Texte correspond à une regex
-- `text NOT EMPTY` - Texte non vide
-- `text EQUALS "valeur"` - Texte égal à une valeur
-
-**Syntaxe :**
-- `FILTER ALL WHERE condition`
-- `FILTER FIRST WHERE condition`
-- `FILTER LAST WHERE condition`
-- `FILTER ONCE index WHERE condition`
-
----
-
-### 5. **Extraction de données (GET)**
-
-#### GET ATTR
-Extrait des attributs HTML des éléments sélectionnés.
-
-```grab
-# Récupère tous les attributs href des liens
+# Extraire tous les liens
+USE main_page
 SELECT ALL "a"
 GET ATTR "href"
+SAVE all_links
 
-# Récupère les attributs src des images
-SELECT ALL "img"
-GET ATTR "src"
-
-# Récupère les attributs alt des images
-SELECT ALL "img"
-GET ATTR "alt"
-```
-
-#### GET ATTR_FIRST / GET ATTR_LAST / GET ATTR_ONCE
-Extrait l'attribut du premier/dernier/nième élément.
-
-```grab
-# Premier href
-SELECT ALL "a"
-GET ATTR_FIRST "href"
-
-# Dernier src d'image
-SELECT ALL "img"
-GET ATTR_LAST "src"
-
-# 5ème attribut href
-SELECT ALL "a"
-GET ATTR_ONCE 5 "href"
-```
-
-#### GET TEXT
-Extrait le texte des éléments sélectionnés.
-
-```grab
-# Texte de tous les paragraphes
-SELECT ALL "p"
-GET TEXT
-
-# Texte des titres
-SELECT ALL "h1, h2, h3"
-GET TEXT
-```
-
-#### GET DATE
-Extrait et parse des dates depuis les éléments.
-
-```grab
-# Dates depuis les éléments time
-SELECT ALL "time"
-GET DATE
-
-# Première date trouvée
-SELECT ALL "span"
-GET DATE_FIRST
-```
-
-**Syntaxe :**
-- `GET ATTR "attribut"`
-- `GET ATTR_FIRST "attribut"`
-- `GET ATTR_LAST "attribut"`
-- `GET ATTR_ONCE index "attribut"`
-- `GET TEXT`
-- `GET DATE`
-- `GET DATE_FIRST`
-- `GET DATE_LAST`
-- `GET DATE_ONCE index`
-
----
-
-### 6. **Extraction par expressions régulières (EXTRACT)**
-
-#### EXTRACT REGEX
-Extrait du contenu en utilisant des expressions régulières.
-
-```grab
-# Extraction d'URLs
-USE ma_page
-EXTRACT REGEX "https?://[^\s]+"
-
-# Extraction d'emails
-EXTRACT REGEX "\b\w+@\w+\.\w+\b"
-
-# Extraction de numéros de téléphone français
-EXTRACT REGEX "0[1-9](?:[0-9\s.-]{8,})"
-
-# Extraction de prix
-EXTRACT REGEX "(\d+(?:\.\d{2})?)\s*[€$£]"
-
-# Extraction de dates DD/MM/YYYY
-EXTRACT REGEX "(\d{1,2})[/-](\d{1,2})[/-](\d{4})"
-
-# Extraction avec flags (insensible à la casse)
-EXTRACT REGEX "\b[A-Z]{2,}\b" i
-
-# Extraction multiline avec flags
-EXTRACT REGEX "<script[^>]*>(.*?)</script>" ms
-```
-
-**Flags disponibles :**
-- `i` - Insensible à la casse (IGNORECASE)
-- `m` - Mode multiline (MULTILINE)
-- `s` - Le point correspond aux retours à la ligne (DOTALL)
-- `x` - Mode verbose (VERBOSE)
-- `a` - Mode ASCII (ASCII)
-
-#### EXTRACT EMAILS
-Extraction spécialisée d'adresses email.
-
-```grab
-EXTRACT EMAILS
-```
-
-#### EXTRACT URLS
-Extraction spécialisée d'URLs.
-
-```grab
-EXTRACT URLS
-```
-
-#### EXTRACT NUMBERS
-Extraction de nombres.
-
-```grab
-EXTRACT NUMBERS
-```
-
-**Syntaxe :**
-- `EXTRACT REGEX "pattern"`
-- `EXTRACT REGEX "pattern" flags`
-- `EXTRACT EMAILS`
-- `EXTRACT URLS`
-- `EXTRACT NUMBERS`
-
----
-
-### 7. **Sauvegarde et gestion des variables (SAVE)**
-
-#### SAVE
-Sauvegarde le résultat de la dernière opération dans une variable.
-
-```grab
-# Sauvegarde une sélection
-SELECT ALL "a"
-SAVE tous_les_liens
-
-# Sauvegarde une extraction
-EXTRACT REGEX "\d+"
-SAVE nombres_extraits
-
-# Sauvegarde un filtrage
-SELECT ALL "p"
-FILTER ALL WHERE text NOT EMPTY
-SAVE paragraphes_avec_texte
-```
-
-**Syntaxe :**
-- `SAVE variable_name`
-
----
-
-### 8. **Affichage et debugging (PRINT)**
-
-#### PRINT
-Affiche le contenu d'une variable ou un texte littéral.
-
-```grab
-# Affichage d'un texte littéral
-PRINT "=== ANALYSE DES LIENS ==="
-PRINT "Début du traitement"
-
-# Affichage d'une variable (mode normal)
-PRINT ma_variable
-
-# Affichage détaillé pour debugging (mode développeur)
-PRINT DEV ma_variable
-```
-
-**Formats d'affichage :**
-- **Texte littéral** : Affichage direct du texte
-- **Mode normal** : Résumé de la variable (type, nombre d'éléments, aperçu)
-- **Mode DEV** : Affichage détaillé avec structure, attributs, statistiques
-
-**Syntaxe :**
-- `PRINT "texte littéral"`
-- `PRINT variable_name`
-- `PRINT DEV variable_name`
-
----
-
-## 🔄 Chaînage d'opérations
-
-GrabLang permet de chaîner les opérations pour créer des pipelines de traitement complexes :
-
-```grab
-# Pipeline complexe : Charge → Sélectionne → Filtre → Extrait → Sauvegarde
-LOAD URL site "https://example.com"
-USE site
-SELECT ALL "a"
-FILTER ALL WHERE attr href CONTAINS "blog"
-GET ATTR "href"
-EXTRACT REGEX "/([^/]+)/?$"
-SAVE blog_slugs
-PRINT "Slugs de blog extraits :"
-PRINT blog_slugs
-```
-
-### Exemples de chaînages courants
-
-#### Extraction d'informations de liens
-```grab
-USE ma_page
-SELECT ALL "a"
-FILTER ALL WHERE attr href NOT NULL
-GET ATTR "href"
-EXTRACT REGEX "https://([^/]+)"
-SAVE domaines
-```
-
-#### Analyse de contenu textuel
-```grab
-SELECT ALL "p"
-FILTER ALL WHERE text NOT EMPTY
-GET TEXT
-EXTRACT REGEX "\b[A-Z][a-z]+\b"
-SAVE mots_capitalises
-```
-
-#### Extraction de métadonnées
-```grab
-SELECT ALL "meta"
-FILTER ALL WHERE attr name EQUALS "keywords"
-GET ATTR "content"
-SAVE meta_keywords
-```
-
----
-
-## 📝 Structure d'un script GrabLang
-
-### Script basique
-```grab
-# Commentaires commencent par #
-# Charge une page web
-LOAD URL ma_page "https://example.com"
-
-# Utilise cette page pour les opérations
-USE ma_page
-
-# Sélectionne tous les liens
-SELECT ALL "a"
-SAVE tous_les_liens
-
-# Affiche le résultat
+# Afficher les résultats
 PRINT "Liens trouvés :"
-PRINT tous_les_liens
+PRINT all_links
 ```
 
-### Script avancé avec analyses multiples
+### Exemple avancé : Analyse de blog
+
 ```grab
-# =================================================================
-# SCRIPT D'ANALYSE COMPLETE
-# =================================================================
+# Chargement et analyse complète d'un blog
+LOAD URL "https://blog.example.com"
+SAVE blog_page
 
-# Chargement de données
-LOAD URL site "https://example.com"
-LOAD URL blog "https://blog.example.com"
-
-PRINT "=== ANALYSE DU SITE PRINCIPAL ==="
-USE site
-
-# Analyse des liens
-SELECT ALL "a"
-FILTER ALL WHERE attr href NOT NULL
-GET ATTR "href"
-SAVE liens_site
-PRINT "Liens du site :"
-PRINT liens_site
-
-# Extraction d'emails
-EXTRACT REGEX "\b\w+@\w+\.\w+\b"
-SAVE emails_site
-PRINT "Emails trouvés :"
-PRINT emails_site
-
-PRINT "=== ANALYSE DU BLOG ==="
-USE blog
-
-# Analyse des articles
-SELECT ALL "article"
-SAVE articles_blog
-PRINT DEV articles_blog
-
-# Extraction des titres
-SELECT ALL "h1, h2"
-GET TEXT
-SAVE titres_blog
-PRINT "Titres des articles :"
-PRINT titres_blog
-
-PRINT "=== FIN DE L'ANALYSE ==="
-```
-
----
-
-## 🛠️ Exemples d'utilisation
-
-### Extraction de données e-commerce
-```grab
-LOAD URL shop "https://shop.example.com/products"
-USE shop
-
-# Extraction des prix
-SELECT ALL ".price"
-GET TEXT
-EXTRACT REGEX "(\d+(?:\.\d{2})?)\s*€"
-SAVE prix_produits
-
-# Extraction des noms de produits
-SELECT ALL ".product-title"
-GET TEXT
-SAVE noms_produits
-
-PRINT "Produits et prix extraits :"
-PRINT prix_produits
-PRINT noms_produits
-```
-
-### Analyse de contenu d'actualités
-```grab
-LOAD URL news "https://news.example.com"
-USE news
+USE blog_page
 
 # Extraction des titres d'articles
-SELECT ALL "h2.article-title"
+SELECT ALL "h2.post-title"
 GET TEXT
-SAVE titres_actualites
+SAVE article_titles
 
-# Extraction des dates de publication
+# Extraction des dates
 SELECT ALL "time"
 GET ATTR "datetime"
 EXTRACT REGEX "(\d{4}-\d{2}-\d{2})"
-SAVE dates_publication
+SAVE publication_dates
 
 # Extraction des auteurs
 SELECT ALL ".author"
 GET TEXT
-EXTRACT REGEX "Par\s+(.+)"
-SAVE auteurs
+SAVE authors
 
-PRINT "Analyse des actualités :"
-PRINT titres_actualites
-PRINT dates_publication
-PRINT auteurs
+# Résumé de l'analyse
+PRINT "=== ANALYSE DU BLOG ==="
+PRINT "Titres :"
+PRINT article_titles
+PRINT "Dates :"
+PRINT publication_dates
+PRINT "Auteurs :"
+PRINT authors
 ```
 
-### Extraction de données de contact
-```grab
-LOAD URL contact "https://example.com/contact"
-USE contact
+## 🔧 Architecture
 
-# Emails
-EXTRACT REGEX "\b[\w.-]+@[\w.-]+\.\w+\b"
-SAVE emails_contact
+GrabLang utilise une architecture moderne séparant les préoccupations :
 
-# Téléphones
-EXTRACT REGEX "0[1-9](?:[0-9\s.-]{8,})"
-SAVE telephones_contact
-
-# Adresses
-SELECT ALL ".address"
-GET TEXT
-SAVE adresses_contact
-
-PRINT "Informations de contact :"
-PRINT emails_contact
-PRINT telephones_contact
-PRINT adresses_contact
+```
+grablang/
+├── core/                 # 🧠 Moteur principal
+│   ├── parser.py        # 📝 Analyse lexicale et syntaxique
+│   ├── executor.py      # ⚙️ Exécution des instructions
+│   └── interpreter.py   # 🎯 Coordinateur principal
+├── commands/            # 📦 Handlers modulaires
+│   ├── load/           # 🌐 Chargement de données
+│   ├── selection/      # 🎯 Sélection d'éléments
+│   ├── extraction/     # 🔍 Extraction de données
+│   ├── filtering/      # 📊 Filtrage conditionnel
+│   └── utilities/      # 🛠️ Utilitaires (SAVE, USE, COUNT)
+├── utils/              # 🔧 Classes de base et utilitaires
+└── cli/               # 🖥️ Interface en ligne de commande
 ```
 
----
+## 📚 Référence des commandes
 
-## 🎯 Types de données supportés
+### 🌐 Chargement de données
 
-### Types d'entrée
-- **URLs HTTP/HTTPS** : Pages web dynamiques ou statiques
-- **Fichiers HTML locaux** : Documents HTML stockés localement
-
-### Types de sélecteurs CSS supportés
-- **Éléments** : `div`, `p`, `a`, `img`, etc.
-- **Classes** : `.ma-classe`, `.nav-item`
-- **IDs** : `#mon-id`, `#header`
-- **Attributs** : `[href]`, `[src*="image"]`
-- **Combinateurs** : `div p`, `nav > a`
-- **Pseudo-classes** : `:first-child`, `:last-child`
-
-### Types de sortie
-- **Listes de chaînes** : Textes, URLs, emails extraits
-- **Éléments HTML** : Objets BeautifulSoup pour manipulation avancée
-- **Attributs** : Valeurs d'attributs HTML
-- **Données parsées** : Dates, nombres, patterns regex
-
----
-
-## 🚨 Gestion d'erreurs
-
-GrabLang fournit des messages d'erreur détaillés :
-
-```grab
-# Erreur de variable inexistante
-USE page_inexistante
-# Erreur: USE: Variable 'page_inexistante' non trouvée
-
-# Erreur de sélecteur vide
-SELECT ALL "element-inexistant"
-# Erreur: SELECT ALL: Aucun élément 'element-inexistant' trouvé
-
-# Erreur de regex invalide
-EXTRACT REGEX "[invalid-regex"
-# Erreur: EXTRACT REGEX: Expression régulière invalide
-```
-
-### Mode debug
-Utilisez le flag `--debug` pour un diagnostic détaillé :
-
-```bash
-python src/core/interpreter.py script.grab --debug
-```
-
----
-
-## 📚 Référence rapide
-
-### Commandes essentielles
 | Commande | Description | Exemple |
 |----------|-------------|---------|
-| `LOAD URL` | Charge une page web | `LOAD URL page "https://example.com"` |
-| `USE` | Sélectionne le document de travail | `USE page` |
+| `LOAD URL` | Charge une page web | `LOAD URL "https://example.com"` |
+
+### 🎯 Sélection et navigation
+
+| Commande | Description | Exemple |
+|----------|-------------|---------|
+| `USE` | Définit le contexte de travail | `USE page_variable` |
 | `SELECT ALL` | Sélectionne tous les éléments | `SELECT ALL "a"` |
-| `FILTER ALL` | Filtre les éléments | `FILTER ALL WHERE text NOT EMPTY` |
-| `GET ATTR` | Extrait des attributs | `GET ATTR "href"` |
+| `SELECT FIRST` | Premier élément | `SELECT FIRST ".title"` |
+| `SELECT LAST` | Dernier élément | `SELECT LAST "p"` |
+
+### 🔍 Extraction de données
+
+| Commande | Description | Exemple |
+|----------|-------------|---------|
+| `GET ATTR` | Extrait des attributs HTML | `GET ATTR "href"` |
 | `GET TEXT` | Extrait le texte | `GET TEXT` |
 | `EXTRACT REGEX` | Extraction par regex | `EXTRACT REGEX "\d+"` |
+| `EXTRACT EMAILS` | Extraction d'emails | `EXTRACT EMAILS` |
+| `EXTRACT URLS` | Extraction d'URLs | `EXTRACT URLS` |
+| `EXTRACT NUMBERS` | Extraction de nombres | `EXTRACT NUMBERS` |
+
+### 📊 Filtrage et conditions
+
+```grab
+# Filtrer par attribut
+FILTER ALL WHERE attr href NOT NULL
+
+# Filtrer par contenu textuel
+FILTER ALL WHERE text CONTAINS "important"
+
+# Filtrer par classe CSS
+FILTER ALL WHERE class CONTAINS "active"
+```
+
+### 🛠️ Utilitaires
+
+| Commande | Description | Exemple |
+|----------|-------------|---------|
 | `SAVE` | Sauvegarde le résultat | `SAVE ma_variable` |
-| `PRINT` | Affiche le contenu | `PRINT ma_variable` |
+| `COUNT` | Compte les éléments | `COUNT` |
+| `PRINT` | Affichage normal | `PRINT ma_variable` |
+| `PRINT DEV` | Affichage debug | `PRINT DEV ma_variable` |
 
-### Conditions de filtrage
-- `attr name EQUALS "value"`
-- `attr name CONTAINS "text"`
-- `attr name NOT NULL`
-- `class CONTAINS "classname"`
-- `text CONTAINS "substring"`
-- `text MATCHES "regex"`
-- `text NOT EMPTY`
-- `text EQUALS "exact"`
+## 🎨 Exemples d'usage
 
-### Flags regex
-- `i` : Insensible à la casse
-- `m` : Multiline
-- `s` : Dotall (. inclut les retours à la ligne)
-- `x` : Verbose
-- `a` : ASCII
+### 💰 E-commerce : Extraction de prix
+
+```grab
+LOAD URL "https://shop.example.com"
+SAVE shop_page
+
+USE shop_page
+SELECT ALL ".price"
+GET TEXT
+EXTRACT REGEX "(\d+(?:\.\d{2})?)\s*€"
+SAVE product_prices
+
+SELECT ALL ".product-name"
+GET TEXT
+SAVE product_names
+
+PRINT "=== PRODUITS ET PRIX ==="
+PRINT product_names
+PRINT product_prices
+```
+
+### 📰 Actualités : Analyse de contenu
+
+```grab
+LOAD URL "https://news.example.com"
+SAVE news_page
+
+USE news_page
+
+# Titres des articles
+SELECT ALL "h2.headline"
+GET TEXT
+SAVE headlines
+
+# Dates de publication  
+SELECT ALL "time"
+GET ATTR "datetime"
+EXTRACT REGEX "(\d{4}-\d{2}-\d{2})"
+SAVE dates
+
+# Extraction d'emails de contact
+EXTRACT REGEX "\b[\w.-]+@[\w.-]+\.\w+\b"
+SAVE contact_emails
+
+PRINT "=== ANALYSE ACTUALITÉS ==="
+PRINT headlines
+PRINT dates
+PRINT contact_emails
+```
+
+### 🔗 SEO : Analyse de liens
+
+```grab
+LOAD URL "https://example.com"
+SAVE main_site
+
+USE main_site
+
+# Liens internes
+SELECT ALL "a"
+FILTER ALL WHERE attr href NOT NULL
+GET ATTR "href"
+FILTER ALL WHERE text NOT CONTAINS "http"
+SAVE internal_links
+
+# Liens externes
+USE main_site
+SELECT ALL "a"
+GET ATTR "href"
+EXTRACT REGEX "https?://([^/]+)"
+SAVE external_domains
+
+PRINT "=== ANALYSE SEO ==="
+PRINT "Liens internes :"
+PRINT internal_links
+PRINT "Domaines externes :"
+PRINT external_domains
+```
+
+## 🧪 Tests et validation
+
+Le projet inclut une suite de tests complète :
+
+```bash
+# Lancer les tests
+python -m pytest tests/
+
+# Tests avec couverture
+python -m pytest tests/ --cov=grablang
+
+# Test d'un script complexe
+grablang examples/test_complexe_fonctionnel.grab
+```
+
+### Script de test complexe
+
+Le projet inclut un script de test avancé qui valide toutes les fonctionnalités sur le blog DeepMind :
+
+- ✅ **8 504 caractères** de texte analysés
+- ✅ **589 divs**, **88 paragraphes** détectés
+- ✅ **183 liens**, **157 URLs** extraites
+- ✅ **75 nombres**, **113 images** analysées
+- ✅ **14 années** trouvées par regex
+- ✅ **79 acronymes** identifiés
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! 
+
+### Développement local
+
+```bash
+# Fork du projet
+git clone https://github.com/votre-fork/grablang.git
+
+# Installation en mode développement
+pip install -e .
+
+# Lancer les tests
+python -m pytest
+
+# Vérifier le style de code
+black grablang/
+flake8 grablang/
+```
+
+### Ajout de nouvelles commandes
+
+1. Créer le handler dans `grablang/commands/`
+2. Implémenter la classe héritant de `BaseCommand`
+3. Ajouter les tests correspondants
+4. Mettre à jour la documentation
+
+## 📄 Licence
+
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+## 🙏 Remerciements
+
+- **BeautifulSoup4** pour le parsing HTML robuste
+- **Requests** pour la gestion des requêtes HTTP
+- La communauté **Python** pour l'écosystème exceptionnel
 
 ---
 
-*GrabLang v1.0 - Langage DSL pour l'extraction de données web*
+<div align="center">
+
+**[Documentation complète](docs/) • [Exemples avancés](examples/) • [Contribuer](CONTRIBUTING.md)**
+
+Fait avec ❤️ par l'équipe GrabLang
+
+</div>
