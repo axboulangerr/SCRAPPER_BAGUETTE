@@ -27,6 +27,12 @@ class SelectLastCommand(BaseCommand):
             colored_prefix = CommandColors.colorize_prefix("SELECT LAST", "SELECT LAST")
             print(f"{colored_prefix} {message}")
     
+    def _clean_quotes(self, text: str) -> str:
+        """Supprime les guillemets d'ouverture et de fermeture si présents"""
+        if (text.startswith('"') and text.endswith('"')) or (text.startswith("'") and text.endswith("'")):
+            return text[1:-1]
+        return text
+
     def execute(self, args: List[str], variables: Dict[str, Any]) -> Tag:
         """
         Exécute SELECT LAST "tag"
@@ -40,7 +46,7 @@ class SelectLastCommand(BaseCommand):
         """
         self.validate_args(args, 1, "SELECT LAST")
         
-        tag = args[0]
+        tag = self._clean_quotes(args[0])  # Nettoie les guillemets
         soup = variables['_current_soup']
         
         if not isinstance(soup, BeautifulSoup):

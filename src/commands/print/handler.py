@@ -151,28 +151,51 @@ class PrintHandler(BaseCommand):
         
         return "\n".join(result)
     
+    def _is_string_literal(self, text: str) -> bool:
+        """Vérifie si le texte est une chaîne littérale (entre guillemets)"""
+        return (text.startswith('"') and text.endswith('"')) or (text.startswith("'") and text.endswith("'"))
+    
+    def _extract_string_content(self, text: str) -> str:
+        """Extrait le contenu d'une chaîne littérale (supprime les guillemets)"""
+        if self._is_string_literal(text):
+            return text[1:-1]  # Supprime le premier et dernier caractère (guillemets)
+        return text
+
     def execute(self, args: List[str], variables: Dict[str, Any]) -> None:
         """
         Exécute la commande PRINT
         
         Args:
-            args: [variable_name] ou [DEV, variable_name]
+            args: [variable_name_ou_string] ou [DEV, variable_name]
             variables: Variables disponibles
         """
         if len(args) < 1 or len(args) > 2:
-            raise ValueError("PRINT: Utilisez PRINT variable_name ou PRINT DEV variable_name")
+            raise ValueError("PRINT: Utilisez PRINT variable_name, PRINT \"texte\" ou PRINT DEV variable_name")
         
         # Détermine le mode (normal ou DEV)
         dev_mode = False
         if len(args) == 2:
             if args[0].upper() == "DEV":
                 dev_mode = True
-                variable_name = args[1]
+                target = args[1]
             else:
-                raise ValueError("PRINT: Format incorrect. Utilisez PRINT variable_name ou PRINT DEV variable_name")
+                raise ValueError("PRINT: Format incorrect. Utilisez PRINT variable_name, PRINT \"texte\" ou PRINT DEV variable_name")
         else:
-            variable_name = args[0]
+            target = args[0]
         
+        # Vérifie si c'est une chaîne littérale
+        if self._is_string_literal(target):
+            # C'est une chaîne littérale - affichage direct
+            string_content = self._extract_string_content(target)
+            self._debug_print(f"Affichage de la chaîne littérale: '{string_content}'")
+            
+            # Affiche le résultat avec une couleur spéciale pour PRINT
+            colored_prefix = CommandColors.colorize_prefix("PRINT", "PRINT")
+            print(f"{colored_prefix} {string_content}")
+            return
+        
+        # C'est une variable - comportement original
+        variable_name = target
         self._debug_print(f"Affichage de la variable '{variable_name}' (mode {'DEV' if dev_mode else 'normal'})")
         
         # Vérifie que la variable existe

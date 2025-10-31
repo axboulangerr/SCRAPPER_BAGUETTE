@@ -77,6 +77,9 @@ class GrabInterpreter:
                 elif command_key == "FILTERING":
                     self.commands["FILTER"] = handler_instance
                     self._debug_print(f"Alias ajouté: FILTER -> {command_key}")
+                elif command_key == "EXTRACTION":
+                    self.commands["EXTRACT"] = handler_instance
+                    self._debug_print(f"Alias ajouté: EXTRACT -> {command_key}")
                 
             else:
                 self._debug_print(f"Attention: Classe {class_name} non trouvée dans {handler_file}")
@@ -234,6 +237,7 @@ class GrabInterpreter:
                 if char in ['"', "'"]:
                     in_quotes = True
                     quote_char = char
+                    current_token += char  # Conserve le guillement d'ouverture
                 elif char.isspace():
                     if current_token:
                         tokens.append(current_token)
@@ -242,6 +246,7 @@ class GrabInterpreter:
                     current_token += char
             else:
                 if char == quote_char:
+                    current_token += char  # Conserve le guillement de fermeture
                     in_quotes = False
                     quote_char = None
                 else:
@@ -255,7 +260,7 @@ class GrabInterpreter:
         return tokens
     
     def _handle_special_commands(self, tokens: List[str]):
-        """Gère les commandes spéciales comme SAVE, COUNT, etc."""
+        """Gère les commandes spéciales comme SAVE, COUNT, EXTRACT REGEX, etc."""
         if tokens[0] == "SAVE" and len(tokens) >= 2:
             # SAVE variable_name
             if '_last_result' in self.variables:
@@ -269,6 +274,62 @@ class GrabInterpreter:
                 count = len(self.variables[var_name]) if hasattr(self.variables[var_name], '__len__') else 1
                 self.variables['_last_result'] = count
                 self._debug_print(f"Comptage effectué: {count} éléments")
+        
+        elif tokens[0].upper() == "EXTRACT" and len(tokens) >= 3 and tokens[1].upper() == "REGEX":
+            # EXTRACT REGEX "pattern" [flags]
+            pattern = tokens[2]
+            flags = tokens[3] if len(tokens) > 3 else ""
+            
+            # Détermine les flags regex
+            regex_flags = 0
+            if 'i' in flags.lower():
+                regex_flags |= re.IGNORECASE
+            if 'm' in flags.lower():
+                regex_flags |= re.MULTILINE
+            if 's' in flags.lower():
+                regex_flags |= re.DOTALL
+            
+            # Utilise le handler d'extraction si disponible
+            if "EXTRACTION" in self.commands:
+                # Prépare les arguments pour le handler d'extraction
+                args = ["REGEX", pattern]
+                if flags:
+                    args.append(flags)
+                
+                self._debug_print(f"Extraction REGEX avec pattern: {pattern}, flags: {flags}")
+                result = self.commands["EXTRACTION"].execute(args, self.variables)
+                
+                if result is not None:
+                    self.variables['_last_result'] = result
+                    self._debug_print(f"Résultat d'extraction stocké (type: {type(result).__name__})")
+            else:
+                # Fallback: extraction manuelle basique
+                self._debug_print(f"Handler EXTRACTION non disponible, extraction manuelle")
+                if '_last_result' in self.variables:
+                    from bs4 import BeautifulSoup, ResultSet, Tag
+                    
+                    source = self.variables['_last_result']
+                    matches = []
+                    
+                    if isinstance(source, (BeautifulSoup, Tag)):
+                        # Extraction depuis HTML
+                        text_content = source.get_text()
+                        matches = re.findall(pattern, text_content, regex_flags)
+                    elif isinstance(source, ResultSet):
+                        # Extraction depuis une liste d'éléments
+                        for element in source:
+                            if hasattr(element, 'get_text'):
+                                text_content = element.get_text()
+                                matches.extend(re.findall(pattern, text_content, regex_flags))
+                    elif isinstance(source, str):
+                        # Extraction depuis une chaîne
+                        matches = re.findall(pattern, source, regex_flags)
+                    
+                    # Stocke le résultat
+                    self.variables['_last_result'] = matches
+                    self._debug_print(f"Extraction manuelle réalisée: {len(matches)} correspondances")
+                else:
+                    raise ValueError("EXTRACT REGEX: Aucune donnée source disponible (_last_result)")
         
         else:
             raise ValueError(f"Commande inconnue: {' '.join(tokens)}")

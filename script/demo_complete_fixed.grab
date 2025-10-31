@@ -2,7 +2,7 @@
 # SCRIPT GRAB COMPLEXE CORRIGÉ - DÉMONSTRATION COMPLÈTE DU LANGAGE
 # =================================================================
 # Ce script démontre toutes les fonctionnalités du DSL GrabLang
-# Date: 31 octobre 2025 - Version corrigée
+# Date: 31 octobre 2025 - Version corrigée avec nouvelles fonctionnalités
 
 # =================================================================
 # 1. CHARGEMENT DE DONNÉES MULTIPLES
@@ -61,7 +61,62 @@ SAVE third_span_with_text
 PRINT third_span_with_text
 
 # =================================================================
-# 4. EXTRACTION D'ATTRIBUTS AVEC SYNTAXE CORRECTE
+# 4. NOUVELLES FONCTIONNALITÉS - EXTRACTION REGEX
+# =================================================================
+
+# Extraction de toutes les URLs avec EXTRACT REGEX
+USE deepmind
+EXTRACT REGEX "https?://[^\s\"]+"
+SAVE extracted_urls
+PRINT DEV extracted_urls
+
+# Extraction d'emails avec regex insensible à la casse
+EXTRACT REGEX "\b\w+@\w+\.\w+\b" i
+SAVE extracted_emails
+PRINT extracted_emails
+
+# Extraction de dates au format DD/MM/YYYY ou DD-MM-YYYY
+EXTRACT REGEX "(\d{1,2})[/-](\d{1,2})[/-](\d{4})"
+SAVE extracted_dates
+PRINT extracted_dates
+
+# Extraction de numéros de téléphone français
+EXTRACT REGEX "0[1-9](?:[0-9]{8}|\s[0-9]{2}\s[0-9]{2}\s[0-9]{2}\s[0-9]{2})"
+SAVE phone_numbers
+PRINT phone_numbers
+
+# Extraction de prix (nombres avec devises)
+EXTRACT REGEX "(\d+(?:\.\d{2})?)\s*[€$£¥]" i
+SAVE extracted_prices
+PRINT extracted_prices
+
+# Extraction de mots en majuscules (acronymes potentiels)
+EXTRACT REGEX "\b[A-Z]{2,}\b"
+SAVE acronyms
+PRINT acronyms
+
+# Extraction de hashtags
+EXTRACT REGEX "#\w+"
+SAVE hashtags
+PRINT hashtags
+
+# Extraction de mentions (@utilisateur)
+EXTRACT REGEX "@\w+"
+SAVE mentions
+PRINT mentions
+
+# Extraction de codes postaux français
+EXTRACT REGEX "\b\d{5}\b"
+SAVE postal_codes
+PRINT postal_codes
+
+# Extraction de contenus entre guillemets
+EXTRACT REGEX "\"([^\"]*)\""
+SAVE quoted_content
+PRINT quoted_content
+
+# =================================================================
+# 5. EXTRACTION D'ATTRIBUTS AVEC SYNTAXE CORRECTE
 # =================================================================
 
 # Utiliser les liens valides pour extraire les attributs
@@ -88,7 +143,7 @@ SAVE all_deepmind_hrefs
 PRINT DEV all_deepmind_hrefs
 
 # =================================================================
-# 5. EXTRACTION DE DATES COMPLEXES
+# 6. EXTRACTION DE DATES COMPLEXES
 # =================================================================
 
 # Recherche d'éléments avec des dates
@@ -110,7 +165,61 @@ SAVE first_date_found
 PRINT first_date_found
 
 # =================================================================
-# 6. SÉLECTIONS AVANCÉES AVEC DIFFÉRENTS SÉLECTEURS
+# 7. EXTRACTIONS REGEX AVANCÉES - CONTENU TECHNIQUE
+# =================================================================
+
+# Extraction d'adresses IP
+USE deepmind
+EXTRACT REGEX "\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b"
+SAVE ip_addresses
+PRINT ip_addresses
+
+# Extraction de versions logicielles (ex: v1.2.3, version 2.1.0)
+EXTRACT REGEX "v?(\d+)\.(\d+)(?:\.(\d+))?(?:-[a-zA-Z0-9]+)?" i
+SAVE software_versions
+PRINT software_versions
+
+# Extraction de domaines et sous-domaines
+EXTRACT REGEX "(?:https?://)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})"
+SAVE domains
+PRINT domains
+
+# Extraction de balises HTML (pour analyse de structure)
+EXTRACT REGEX "<(\w+)[^>]*>"
+SAVE html_tags
+PRINT html_tags
+
+# Extraction de classes CSS
+EXTRACT REGEX "class=[\"']([^\"']*)[\"']"
+SAVE css_classes
+PRINT css_classes
+
+# Extraction d'IDs CSS
+EXTRACT REGEX "id=[\"']([^\"']*)[\"']"
+SAVE css_ids
+PRINT css_ids
+
+# =================================================================
+# 8. EXTRACTIONS REGEX MULTILIGNES
+# =================================================================
+
+# Extraction de blocs de code ou scripts (mode multiline)
+EXTRACT REGEX "<script[^>]*>(.*?)</script>" ms
+SAVE script_blocks
+PRINT script_blocks
+
+# Extraction de styles CSS
+EXTRACT REGEX "<style[^>]*>(.*?)</style>" ms
+SAVE style_blocks
+PRINT style_blocks
+
+# Extraction de commentaires HTML
+EXTRACT REGEX "<!--(.*?)-->" ms
+SAVE html_comments
+PRINT html_comments
+
+# =================================================================
+# 9. SÉLECTIONS AVANCÉES AVEC DIFFÉRENTS SÉLECTEURS
 # =================================================================
 
 # Retour sur DeepMind pour analyses complètes
@@ -132,7 +241,7 @@ SAVE tenth_image
 PRINT tenth_image
 
 # =================================================================
-# 7. CHAÎNAGE D'OPÉRATIONS COMPLEXES
+# 10. CHAÎNAGE D'OPÉRATIONS COMPLEXES
 # =================================================================
 
 # Séquence complexe: navigation → sélection → filtrage → extraction
@@ -165,11 +274,41 @@ SAVE first_h3_title
 PRINT first_h3_title
 
 # =================================================================
-# 8. GESTION D'ERREURS ET CAS LIMITES
+# 11. EXTRACTIONS REGEX SPÉCIALISÉES PAR DOMAINE
+# =================================================================
+
+# Extraction de références académiques (DOI)
+USE deepmind
+EXTRACT REGEX "10\.\d{4,}/[^\s]+"
+SAVE doi_references
+PRINT doi_references
+
+# Extraction de références arXiv
+EXTRACT REGEX "arXiv:\d{4}\.\d{4,5}"
+SAVE arxiv_references
+PRINT arxiv_references
+
+# Extraction de coordonnées GPS
+EXTRACT REGEX "(-?\d+\.?\d*),\s*(-?\d+\.?\d*)"
+SAVE gps_coordinates
+PRINT gps_coordinates
+
+# Extraction de numéros de modèles/séries
+EXTRACT REGEX "\b[A-Z]{1,3}-?\d{2,6}[A-Z]?\b"
+SAVE model_numbers
+PRINT model_numbers
+
+# =================================================================
+# 12. GESTION D'ERREURS ET CAS LIMITES
 # =================================================================
 
 # Test avec httpbin (structure simple)
 USE httpbin
+
+# Extraction regex sur page simple
+EXTRACT REGEX "\b[A-Z][a-z]+\b"
+SAVE httpbin_words
+PRINT httpbin_words
 
 # Sélection sur une page simple
 SELECT ALL "p"
@@ -182,7 +321,7 @@ SAVE test_paragraphs
 PRINT test_paragraphs
 
 # =================================================================
-# 9. EXTRACTION MASSIVE DE DONNÉES
+# 13. EXTRACTION MASSIVE DE DONNÉES
 # =================================================================
 
 # Retour sur DeepMind pour extraction complète
@@ -221,78 +360,318 @@ SAVE image_alts
 PRINT image_alts
 
 # =================================================================
-# 10. COMBINAISONS AVANCÉES DE FILTRES
+# 14. CHAÎNAGE D'OPÉRATIONS : GET → FILTER → EXTRACT
 # =================================================================
 
-# Recherche d'éléments avec classes multiples
+# Exemple 1: Analyse des liens avec chaînage complet
 USE deepmind
+SELECT ALL "a"
+GET ATTR href
+FILTER ALL WHERE text CONTAINS "http"
+EXTRACT REGEX "https://([^/]+)"
+SAVE chained_domains
+PRINT chained_domains
+
+# Exemple 2: Extraction d'IDs CSS puis filtrage
+USE deepmind
+EXTRACT REGEX "id=[\"']([^\"']*)[\"']"
+FILTER ALL WHERE text MATCHES "^[a-zA-Z]"
+SAVE valid_css_ids
+PRINT valid_css_ids
+
+# Exemple 3: Chaînage avec sélection → extraction → filtrage
 SELECT ALL "div"
-FILTER ALL WHERE class CONTAINS "flex"
-SAVE flex_divs
-PRINT flex_divs
-
-# Parmi les flex divs, ceux avec du texte
-FILTER ALL WHERE text MATCHES ".+"
-SAVE flex_divs_with_text
-PRINT DEV flex_divs_with_text
-
-# Premier flex div avec beaucoup de texte
-FILTER FIRST WHERE text MATCHES ".{20,}"
-SAVE first_long_text_flex
-PRINT first_long_text_flex
+EXTRACT REGEX "class=[\"']([^\"']*)[\"']"
+FILTER ALL WHERE text CONTAINS "container"
+SAVE container_classes
+PRINT container_classes
 
 # =================================================================
-# 11. TEST AVEC EXAMPLE.COM (PAGE SIMPLE)
+# 15. CHAÎNAGE AVANCÉ : FILTER → GET → EXTRACT
 # =================================================================
 
-# Test sur une page très simple
-USE example
-PRINT DEV example
+# Exemple 1: Filtrer les éléments puis extraire leurs attributs
+USE deepmind
+SELECT ALL "a"
+FILTER ALL WHERE attr href CONTAINS "blog"
+GET ATTR href
+EXTRACT REGEX "/([^/]+)/?$"
+SAVE blog_slugs
+PRINT blog_slugs
 
-# Extraction du titre
+# Exemple 2: Chaînage avec dates
+SELECT ALL "time"
+FILTER ALL WHERE attr datetime NOT NULL
+GET ATTR datetime
+EXTRACT REGEX "(\d{4})-(\d{2})-(\d{2})"
+SAVE extracted_date_parts
+PRINT extracted_date_parts
+
+# Exemple 3: Filtrage puis extraction de texte
+SELECT ALL "h2"
+FILTER ALL WHERE text MATCHES ".{10,}"
+GET TEXT
+EXTRACT REGEX "\b[A-Z][a-z]+\b"
+SAVE title_keywords
+PRINT title_keywords
+
+# =================================================================
+# 16. CHAÎNAGE COMPLEXE : EXTRACT → FILTER → GET
+# =================================================================
+
+# Exemple 1: Extraction d'attributs multiples puis filtrage
+USE deepmind
+SELECT ALL "img"
+GET ATTR alt
+FILTER ALL WHERE text NOT EMPTY
+EXTRACT REGEX "\b\w{4,}\b"
+SAVE image_alt_words
+PRINT image_alt_words
+
+# Exemple 2: Extraction d'URLs puis analyse
+USE deepmind
+EXTRACT REGEX "https?://[^\s\"']+"
+FILTER ALL WHERE text CONTAINS "google"
+EXTRACT REGEX "//([^/]+)"
+SAVE google_domains
+PRINT google_domains
+
+# Exemple 3: Classes CSS → filtrage → extraction de préfixes
+EXTRACT REGEX "class=[\"']([^\"']*)[\"']"
+FILTER ALL WHERE text CONTAINS "-"
+EXTRACT REGEX "^([^-]+)"
+SAVE css_prefixes
+PRINT css_prefixes
+
+# =================================================================
+# 17. CHAÎNAGES MULTIPLES SUR DIFFÉRENTS CONTENUS
+# =================================================================
+
+# Travail sur httpbin pour structure simple
+USE httpbin
 SELECT ALL "h1"
-SAVE example_title
-PRINT example_title
+GET TEXT
+FILTER ALL WHERE text MATCHES "\w+"
+EXTRACT REGEX "\b[A-Z]+\b"
+SAVE httpbin_acronyms
+PRINT httpbin_acronyms
 
-# Extraction du paragraphe
-SELECT ALL "p"
-SAVE example_paragraph
-PRINT DEV example_paragraph
-
-# =================================================================
-# 12. VÉRIFICATIONS ET TESTS DE ROBUSTESSE
-# =================================================================
-
-# Affichage de données importantes
-PRINT DEV all_deepmind_hrefs
-PRINT DEV image_sources
-PRINT DEV flex_divs_with_text
+# Analyse des métadonnées
+USE httpbin
+SELECT ALL "meta"
+GET ATTR content
+FILTER ALL WHERE text NOT EMPTY
+EXTRACT REGEX "\b\w{5,}\b"
+SAVE meta_keywords
+PRINT meta_keywords
 
 # =================================================================
-# 13. RÉCAPITULATIF FINAL
+# 18. CHAÎNAGES AVEC OPÉRATIONS SPÉCIALISÉES
 # =================================================================
 
-# Affichage de toutes les variables importantes créées
-PRINT deepmind
-PRINT httpbin
-PRINT example
-PRINT all_deepmind_links
-PRINT valid_links_deepmind
-PRINT all_deepmind_hrefs
-PRINT h1_titles
-PRINT h2_titles
-PRINT nav_links
-PRINT all_images
-PRINT flex_divs_with_text
+# Chaînage avec extraction de numéros puis validation
+USE deepmind
+EXTRACT REGEX "\b\d+\b"
+FILTER ALL WHERE text MATCHES "^\d{3,}$"
+SAVE large_numbers
+PRINT large_numbers
+
+# Chaînage avec extraction d'emails puis domaines
+EXTRACT REGEX "\b\w+@(\w+\.\w+)\b"
+FILTER ALL WHERE text CONTAINS "."
+EXTRACT REGEX "\.(\w+)$"
+SAVE email_domains
+PRINT email_domains
+
+# Chaînage avec attributs style puis couleurs
+SELECT ALL "*"
+GET ATTR style
+FILTER ALL WHERE text CONTAINS "color"
+EXTRACT REGEX "color:\s*([^;]+)"
+SAVE style_colors
+PRINT style_colors
 
 # =================================================================
-# FIN DU SCRIPT COMPLEXE CORRIGÉ
+# 19. CHAÎNAGES AVEC SÉLECTEURS AVANCÉS
 # =================================================================
-# Variables créées: 25+
+
+# Premier élément → extraction → filtrage
+USE deepmind
+SELECT FIRST "main"
+EXTRACT REGEX "\b[A-Z]{2,}\b"
+FILTER ALL WHERE text MATCHES "^[A-Z]{3,}$"
+SAVE main_acronyms
+PRINT main_acronyms
+
+# Dernier élément → attributs → extraction
+SELECT LAST "footer"
+GET ATTR class
+EXTRACT REGEX "\b\w+-\w+\b"
+SAVE footer_compound_classes
+PRINT footer_compound_classes
+
+# Élément spécifique → texte → mots-clés
+SELECT ONCE 5 "div"
+GET TEXT
+EXTRACT REGEX "\b[a-z]{6,}\b"
+SAVE long_words
+PRINT long_words
+
+# =================================================================
+# 20. CHAÎNAGES POUR ANALYSE DE PERFORMANCE
+# =================================================================
+
+# Extraction de scripts puis analyse
+USE deepmind
+SELECT ALL "script"
+GET ATTR src
+FILTER ALL WHERE text CONTAINS "js"
+EXTRACT REGEX "/([^/]+\.js)$"
+SAVE javascript_files
+PRINT javascript_files
+
+# Extraction de styles puis analyse
+SELECT ALL "link"
+FILTER ALL WHERE attr rel EQUALS "stylesheet"
+GET ATTR href
+EXTRACT REGEX "/([^/]+\.css)$"
+SAVE stylesheet_files
+PRINT stylesheet_files
+
+# =================================================================
+# 21. EXEMPLES DE CHAÎNAGES MÉTIER
+# =================================================================
+
+# Analyse e-commerce : prix → validation → extraction
+USE deepmind
+EXTRACT REGEX "(\d+(?:\.\d{2})?)\s*[€$£]"
+FILTER ALL WHERE text MATCHES "^\d+\.\d{2}"
+EXTRACT REGEX "^(\d+)"
+SAVE price_integers
+PRINT price_integers
+
+# Analyse contenu : titres → mots → fréquence
+SELECT ALL "h1, h2, h3"
+GET TEXT
+EXTRACT REGEX "\b[A-Za-z]{4,}\b"
+FILTER ALL WHERE text MATCHES "^[A-Z]"
+SAVE capitalized_words
+PRINT capitalized_words
+
+# Analyse technique : attributs data → extraction de valeurs
+SELECT ALL "*"
+GET ATTR data-id
+FILTER ALL WHERE text NOT EMPTY
+EXTRACT REGEX "^(\w+)"
+SAVE data_id_prefixes
+PRINT data_id_prefixes
+
+# =================================================================
+# 22. CHAÎNAGES AVEC REGEX COMPLEXES
+# =================================================================
+
+# URLs complètes → domaines → TLD
+USE deepmind
+EXTRACT REGEX "https?://([^/\s]+)"
+FILTER ALL WHERE text CONTAINS "."
+EXTRACT REGEX "\.([a-z]{2,})$"
+SAVE top_level_domains
+PRINT top_level_domains
+
+# Dates complexes → normalisation
+EXTRACT REGEX "(\d{1,2})[/-](\d{1,2})[/-](\d{4})"
+FILTER ALL WHERE text MATCHES "\d{1,2}[/-]\d{1,2}[/-]\d{4}"
+EXTRACT REGEX "(\d{4})$"
+SAVE extracted_years
+PRINT extracted_years
+
+# Coordonnées → latitude/longitude
+EXTRACT REGEX "(-?\d+\.?\d*),\s*(-?\d+\.?\d*)"
+FILTER ALL WHERE text CONTAINS ","
+EXTRACT REGEX "^([^,]+)"
+SAVE latitudes
+PRINT latitudes
+
+# =================================================================
+# 23. VALIDATION ET NETTOYAGE DE DONNÉES
+# =================================================================
+
+# Validation d'emails avec chaînage
+USE deepmind
+EXTRACT REGEX "\b[\w.-]+@[\w.-]+\.\w+\b"
+FILTER ALL WHERE text CONTAINS "@"
+FILTER ALL WHERE text CONTAINS "."
+EXTRACT REGEX "@([\w.-]+)"
+SAVE email_providers
+PRINT email_providers
+
+# Nettoyage de numéros de téléphone
+EXTRACT REGEX "0[1-9](?:[0-9\s.-]{8,})"
+FILTER ALL WHERE text MATCHES "^0[1-9]"
+EXTRACT REGEX "(\d{10})"
+SAVE clean_phone_numbers
+PRINT clean_phone_numbers
+
+# =================================================================
+# 24. ANALYSE FINALE ET RÉSUMÉ
+# =================================================================
+
+PRINT "=== RÉSUMÉ DES EXTRACTIONS ==="
+
+# Récapitulatif des données extraites - Principales variables créées
+USE deepmind
+
+PRINT "--- URLs extraites ---"
+PRINT extracted_urls
+
+PRINT "--- Classes CSS ---"
+PRINT css_classes
+
+PRINT "--- IDs CSS ---"
+PRINT css_ids
+
+PRINT "--- Domaines chaînés ---"
+PRINT chained_domains
+
+PRINT "--- Slugs de blog ---"
+PRINT blog_slugs
+
+PRINT "--- Fichiers JavaScript ---"
+PRINT javascript_files
+
+PRINT "=== ANALYSE DE EXAMPLE.COM ==="
+
+# Statistiques sur example.com (page simple)
+USE example
+SELECT ALL "*"
+SAVE example_all_elements
+PRINT "--- Tous les éléments de example.com ---"
+PRINT DEV example_all_elements
+
+# Extraction finale sur example.com
+EXTRACT REGEX "\b[A-Z][a-z]+\b"
+SAVE example_words
+PRINT "--- Mots capitalisés d'example.com ---"
+PRINT example_words
+
+PRINT "=== FIN DU SCRIPT - TOUTES LES FONCTIONNALITÉS DÉMONTRÉES ==="
+
+# =================================================================
+# FIN DU SCRIPT - TOUTES LES FONCTIONNALITÉS DÉMONTRÉES
+# =================================================================
+# =================================================================
+# FIN DU SCRIPT COMPLEXE CORRIGÉ ET AMÉLIORÉ
+# =================================================================
+# Variables créées: 40+
 # Pages analysées: 3 (DeepMind, HTTPBin, Example.com)
 # Commandes utilisées: LOAD URL, USE, SELECT (ALL/FIRST/LAST/ONCE), 
 #                      FILTER (ALL/FIRST/LAST/ONCE), GET (ATTR/DATE),
+#                      EXTRACT REGEX (nouvelle fonctionnalité),
 #                      SAVE, PRINT, PRINT DEV
-# Opérations: 70+ lignes de traitement
+# Opérations: 120+ lignes de traitement
+# Nouvelles fonctionnalités: 20+ extractions regex spécialisées
 # Corrections: Syntaxe GET corrigée, URLs fonctionnelles
+# Améliorations: Extraction regex pour URLs, emails, dates, prix,
+#               téléphones, domaines, versions, coordonnées GPS,
+#               références académiques, balises HTML, classes CSS
 # =================================================================

@@ -27,12 +27,18 @@ class SelectOnceCommand(BaseCommand):
             colored_prefix = CommandColors.colorize_prefix("SELECT ONCE", "SELECT ONCE")
             print(f"{colored_prefix} {message}")
     
+    def _clean_quotes(self, text: str) -> str:
+        """Supprime les guillemets d'ouverture et de fermeture si présents"""
+        if (text.startswith('"') and text.endswith('"')) or (text.startswith("'") and text.endswith("'")):
+            return text[1:-1]
+        return text
+
     def execute(self, args: List[str], variables: Dict[str, Any]) -> Tag:
         """
-        Exécute SELECT ONCE "tag" index
+        Exécute SELECT ONCE index "tag"
         
         Args:
-            args: [tag, index] - Le tag HTML à rechercher et l'index (1-based)
+            args: [index, tag] - L'index et le tag HTML à rechercher
             variables: Variables disponibles
             
         Returns:
@@ -40,11 +46,12 @@ class SelectOnceCommand(BaseCommand):
         """
         self.validate_args(args, 2, "SELECT ONCE")
         
-        tag = args[0]
         try:
-            index = int(args[1])
+            index = int(args[0])
         except ValueError:
-            raise ValueError(f"SELECT ONCE: L'index doit être un nombre entier, reçu '{args[1]}'")
+            raise ValueError(f"SELECT ONCE: L'index doit être un nombre entier, reçu '{args[0]}'")
+        
+        tag = self._clean_quotes(args[1])  # Nettoie les guillemets
         
         if index < 1:
             raise ValueError(f"SELECT ONCE: L'index doit être supérieur à 0, reçu {index}")

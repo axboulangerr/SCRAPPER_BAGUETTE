@@ -28,6 +28,12 @@ class LoadUrlCommand(BaseCommand):
             colored_prefix = CommandColors.colorize_prefix("LOAD URL", "LOAD URL")
             print(f"{colored_prefix} {message}")
     
+    def _clean_quotes(self, text: str) -> str:
+        """Supprime les guillemets d'ouverture et de fermeture si présents"""
+        if (text.startswith('"') and text.endswith('"')) or (text.startswith("'") and text.endswith("'")):
+            return text[1:-1]
+        return text
+
     def execute(self, args: List[str], variables: Dict[str, Any]) -> BeautifulSoup:
         """
         Exécute LOAD URL "url" ou LOAD URL variable_name "url"
@@ -45,12 +51,12 @@ class LoadUrlCommand(BaseCommand):
         # Détermine si on a une variable ou juste l'URL
         if len(args) == 1:
             # Format: LOAD URL "url"
-            url = args[0]
+            url = self._clean_quotes(args[0])
             variable_name = None
         else:
             # Format: LOAD URL variable_name "url"
-            variable_name = args[0]
-            url = args[1]
+            variable_name = args[0]  # Le nom de variable ne doit pas être nettoyé
+            url = self._clean_quotes(args[1])
         
         try:
             self._debug_print(f"Chargement de l'URL: {url}")
