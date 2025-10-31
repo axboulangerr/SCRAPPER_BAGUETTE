@@ -325,6 +325,4 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de 
 
 **[Documentation complète](docs/) • [Exemples avancés](examples/) • [Contribuer](CONTRIBUTING.md)**
 
-Fait avec ❤️ par l'équipe GrabLang
-
 </div>
